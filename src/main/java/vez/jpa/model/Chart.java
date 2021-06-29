@@ -11,13 +11,18 @@ public class Chart {
     private Long id;
     private String name;
 
-    @OneToOne(cascade = CascadeType.PERSIST, mappedBy="chart")
-    private ChartRef chartRef;
+    // owner side: it doesn't have mappedBy, and can decide how the association is mapped: with a join table
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinTable(name="chart_ref_subjarea",
+            joinColumns={@JoinColumn(name="chart_id")},
+            inverseJoinColumns={@JoinColumn(name="subj_id")})
+    private SubjArea subjArea;
 
-    public Chart() { }
+    protected Chart() { }
 
-    public Chart(String name) {
+    public Chart(SubjArea subjArea, String name) {
         this.name = name;
+        this.subjArea = subjArea;
     }
 
     public Long getId() {
@@ -34,20 +39,20 @@ public class Chart {
         this.name = name;
     }
 
-    public ChartRef getRef() {
-        return chartRef;
+    public SubjArea getSubjArea() {
+        return subjArea;
     }
-    public void setRef(ChartRef ref) {
-        this.chartRef = ref;
+    public void setSubjArea(SubjArea subjArea) {
+        this.subjArea = subjArea;
     }
 
     @Override
     public String toString() {
         return "Chart{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
-                ", chartRef=" + chartRef +
-                '}';
+                ", name='" + name + '\''
+                // + ", chartRef=" + subjArea.getId()
+                + '}';
     }
 
     @Override

@@ -6,8 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import vez.jpa.model.Activity;
-import vez.jpa.model.Category;
+import vez.jpa.model.Chart;
+import vez.jpa.model.SubjArea;
 import vez.jpa.repo.*;
 
 import java.util.concurrent.ThreadLocalRandom;
@@ -19,8 +19,7 @@ public class JpaApp implements CommandLineRunner {
     private static final Logger log = LoggerFactory.getLogger(JpaApp.class);
 
     @Autowired ChartRepo chartRepo;
-    @Autowired
-    AreaRepo areaRepo;
+    @Autowired SubjAreaRepo subjAreaRepo;
     @Autowired UserRepo userRepo;
     @Autowired CategoryRepo categoryRepo;
     @Autowired ActivityRepo activityRepo;
@@ -31,6 +30,7 @@ public class JpaApp implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+/*
         //region Create Categories
         log.info("******** Create Categories: **********");
         LongStream.range(1L, 4L)
@@ -54,6 +54,7 @@ public class JpaApp implements CommandLineRunner {
         Activity act = activityRepo.findById(8L).orElseThrow(()-> new RuntimeException("Not found by id: 8"));
         log.info(String.valueOf( act.getCategory().getId() ));
         //endregion
+*/
 
 /*
         log.info("******** Create Users: **********");
@@ -65,31 +66,34 @@ public class JpaApp implements CommandLineRunner {
         log.info(found.orElse(new User("notfound")).getUsername());
 */
 
-/*
-        //region Create SubjectArea
-        log.info("******** Save SubjArea: **********");
+        //region Create SubjectArea with Charts
+        log.info("******** Create SubjArea: **********");
         LongStream.range(1L, 4L)
-                .mapToObj(l -> new SubjArea(l, "Area_"+l) )
+                .mapToObj(l -> new SubjArea(l, "SubjectArea_"+l) )
                 .map(subjAreaRepo::save)
                 .forEach(item -> log.info(item.toString()));
-        //endregion
-        //region Create Charts
-        log.info("******** Save Chart with Refs: **********");
-        LongStream.range(1L, 10L)
+
+        log.info("******** Create Charts with Refs: **********");
+        LongStream.range(1L, 11L)
                 .mapToObj(l -> {
-                    Chart chart = new Chart( "Chart_"+l);
-                    long subjAreaId = ThreadLocalRandom.current().nextLong(3L)+1;
-                    ChartRef ref = new ChartRef(chart, subjAreaId);
-                    chart.setRef(ref);
+                    long subjId = ThreadLocalRandom.current().nextLong(3L)+1;
+                    SubjArea subjArea = subjAreaRepo.getById(subjId);   // получаем proxy
+                    Chart chart = new Chart( subjArea, "Chart_"+subjId+"-"+l);
                     return chartRepo.save(chart);
                 } )
                 .forEach(chart -> log.info(chart.toString()));
 
         log.info("******** Selecting Charts with Ref: **********");
-        chartRepo.findAll().stream()
+        chartRepo.findAll()
                 .forEach(chart -> log.info(chart.toString()));
-        //endregion
+        log.info("******** Selecting SubjAreas: **********");
+/*
+        subjAreaRepo.findAll()
+                .forEach(subjArea -> log.info(subjArea.toString()));
 */
+
+        subjAreaRepo.findById(1L).ifPresent(subjArea -> log.info(subjArea.toString()));
+        //endregion
 
     }
 }
