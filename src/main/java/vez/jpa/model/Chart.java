@@ -7,29 +7,24 @@ import java.util.Objects;
 @Table(name = "CHART")
 public class Chart {
 
-    @Id @GeneratedValue(strategy=GenerationType.IDENTITY) @Column(name = "chart_id")
-    private Long chartId;
+    @Id @GeneratedValue(strategy=GenerationType.AUTO)
+    private Long id;
     private String name;
 
-/*
-    @OneToOne(fetch = FetchType.LAZY, mappedBy="chart")
-*/
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chart_id")
+    @OneToOne(cascade = CascadeType.PERSIST, mappedBy="chart")
     private ChartRef chartRef;
 
     public Chart() { }
 
-    public Chart(Long chartId, String name) {
-        this.chartId = chartId;
+    public Chart(String name) {
         this.name = name;
     }
 
-    public Long getChartId() {
-        return chartId;
+    public Long getId() {
+        return id;
     }
-    public void setChartId(Long id) {
-        this.chartId = id;
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -49,8 +44,9 @@ public class Chart {
     @Override
     public String toString() {
         return "Chart{" +
-                "id=" + chartId +
+                "id=" + id +
                 ", name='" + name + '\'' +
+                ", chartRef=" + chartRef +
                 '}';
     }
 
@@ -59,11 +55,11 @@ public class Chart {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Chart chart = (Chart) o;
-        return chartId.equals(chart.chartId);
+        return id.equals(chart.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chartId);
+        return Objects.hash(id);
     }
 }

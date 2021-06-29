@@ -7,11 +7,13 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import vez.jpa.model.Chart;
+import vez.jpa.model.ChartRef;
 import vez.jpa.model.SubjArea;
-import vez.jpa.repo.ChartRefRepo;
 import vez.jpa.repo.ChartRepo;
 import vez.jpa.repo.SubjAreaRepo;
+import vez.jpa.repo.UserRepo;
 
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.LongStream;
 
 @SpringBootApplication
@@ -21,8 +23,7 @@ public class JpaApp implements CommandLineRunner {
 
     @Autowired ChartRepo chartRepo;
     @Autowired SubjAreaRepo subjAreaRepo;
-    @Autowired
-    ChartRefRepo refRepo;
+    @Autowired UserRepo userRepo;
 
     public static void main(String[] args) {
         SpringApplication.run(JpaApp.class, args);
@@ -30,6 +31,16 @@ public class JpaApp implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+/*
+        log.info("******** Create Users: **********");
+        User user = new User("johndoe");
+        Address address = new Address(user,"12345");
+        User saved = userRepo.save(user);
+
+        Optional<User> found = userRepo.findById(saved.getId());
+        log.info(found.orElse(new User("notfound")).getUsername());
+*/
+
         //region Create SubjectArea
         log.info("******** Save SubjArea: **********");
         LongStream.range(1L, 4L)
@@ -38,24 +49,21 @@ public class JpaApp implements CommandLineRunner {
                 .forEach(item -> log.info(item.toString()));
         //endregion
         //region Create Charts
-        log.info("******** Save Chart: **********");
+        log.info("******** Save Chart with Refs: **********");
         LongStream.range(1L, 10L)
-                .mapToObj(l -> new Chart( l, "Chart_"+l) )
-                .map(chartRepo::save)
+                .mapToObj(l -> {
+                    Chart chart = new Chart( "Chart_"+l);
+                    long subjAreaId = ThreadLocalRandom.current().nextLong(3L)+1;
+                    ChartRef ref = new ChartRef(chart, subjAreaId);
+                    chart.setRef(ref);
+                    return chartRepo.save(chart);
+                } )
+                .forEach(chart -> log.info(chart.toString()));
+
+        log.info("******** Selecting Charts with Ref: **********");
+        chartRepo.findAll().stream()
                 .forEach(chart -> log.info(chart.toString()));
         //endregion
-        //region Create Refs
-        log.info("******** Save Refs: **********");
-/*
-        chartRepo.findAll().stream()
-                .map(chart -> {
-                    long subjAreaId = ThreadLocalRandom.current().nextLong(3L)+1;
-                    ChartRef ref = new ChartRef(chart.getChartId(), subjAreaId);
-                    ref.setChart(chart);
-                    log.info(ref.toString());
-                    return refRepo.save(ref);
-                })
-                .forEach(ref -> log.info(ref.toString()));
-*/
+
     }
 }
