@@ -11,6 +11,7 @@ import vez.jpa.model.SubjArea;
 import vez.jpa.repo.*;
 
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 @SpringBootApplication
@@ -91,8 +92,14 @@ public class JpaApp implements CommandLineRunner {
         subjAreaRepo.findAll()
                 .forEach(subjArea -> log.info(subjArea.toString()));
 */
+        IntStream.range(1,5)
+                .mapToObj(i -> new Chart(null, "Null_"+i) )
+                .map(chartRepo::save)
+                .map(Chart::toString)
+                .forEach(log::info);
 
-        subjAreaRepo.findById(1L).ifPresent(subjArea -> log.info(subjArea.toString()));
+        chartRepo.findAll().stream().map(Chart::getName).forEach(log::info);
+        // subjAreaRepo.findById(1L).ifPresent(subjArea -> log.info(subjArea.toString()));
         //endregion
 
     }

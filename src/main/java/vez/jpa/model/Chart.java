@@ -13,7 +13,7 @@ public class Chart {
 
     // owner side: it doesn't have mappedBy, and can decide how the association is mapped: with a join table
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinTable(name="chart_ref_subjarea",
+    @JoinTable(name="CHART_REF_SUBJECT_AREA",
             joinColumns={@JoinColumn(name="chart_id")},
             inverseJoinColumns={@JoinColumn(name="subj_id")})
     private SubjArea subjArea;

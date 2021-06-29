@@ -1,0 +1,16 @@
+CREATE TABLE CHART (
+  id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name varchar
+);
+
+CREATE TABLE SUBJECT_AREA (
+  id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name varchar
+);
+
+CREATE TABLE CHART_REF_SUBJECT_AREA (
+  chart_id int(11) NOT NULL PRIMARY KEY,
+  subj_id int(11) NOT NULL,
+  CONSTRAINT fk_ref_chart FOREIGN KEY (chart_id) REFERENCES CHART (id),
+  CONSTRAINT fk_ref_subject_area FOREIGN KEY (subj_id) REFERENCES SUBJECT_AREA (id)
+);
